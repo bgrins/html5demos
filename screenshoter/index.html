@@ -21,25 +21,27 @@ Author: Eric Bidelman (ebidel@gmail.com)
   <title>Binary WebSocket Tab Sharing</title>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
-  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Orbitron|Kameron|Muli|Open+Sans:regular,semibold,italic,italicsemibold|Droid+Sans+Mono&v2">
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+
 <style>
-body {
-  font-family: 'Open Sans';
-}
-iframe, #screenshot0, #screenshot1 {
-  width: 100%;
-  height: 500px;
-  border: 1px solid black;
-}
+  body {
+    font-family: 'Open Sans';
+  }
+  iframe {
+    width: 100%;
+    height: 500px;
+    border: 1px solid black;
+  }
 </style>
 </head>
 <body>
 
 <h3>Screenshot from host:</h3>
-<iframe id="screenshot0" hidden></iframe>
-<iframe id="screenshot1" hidden></iframe>
 
-<div id="frames-container"></div>
+<div id="frames-container">
+<iframe id="screenshot0" hidden></iframe>
+</div>
 
 <script src="screencapture.js"></script>
 <script src="app.js"></script>
@@ -52,17 +54,25 @@ var ws = connect();
 ws.onmessage = function(e) {
   // Shouldn't have to create a new blob, but e.data isn't preserving type.
   var blob = new Blob([e.data], {type: 'text/html'});
-
-  var iframe = document.createElement('iframe');
+console.log(blob);
+  var iframe = $("#screenshot0")[0];
   iframe.src = window.URL.createObjectURL(blob);
-  iframe.hidden = true;
   iframe.onload = renderFrame;
 
   // Force the iframe content to load by appending to the DOM.
-  framesContainer.appendChild(iframe);
+  //framesContainer.appendChild(iframe);
 };
 
 function renderFrame() {
+
+  var frame = $("#screenshot0")[0];
+  frame.hidden = false;
+  $(frame.contentWindow.document).find("input").each(function() {
+    $(this).val($(this).attr("data-value"));
+  });
+
+return;
+
   if (framesContainer.children.length) {
     var frame = framesContainer.children[currentFrameIdx];
 
@@ -71,13 +81,13 @@ function renderFrame() {
     }
 
     if (currentFrameIdx > 0) {
+
       var prevFrame = frame.previousElementSibling;
       prevFrame.hidden = true;
       window.URL.revokeObjectURL(prevFrame.src);
     }
 
     frame.hidden = false;
-
     currentFrameIdx++;
   }
 }

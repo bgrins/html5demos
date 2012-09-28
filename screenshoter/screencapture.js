@@ -1,17 +1,17 @@
 // Copyright 2012 Eric Bidelman
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// 
+//
 // Author: Eric Bidelman (ebidel@)
 
 (function(exports) {
@@ -37,7 +37,7 @@ function urlsToAbsolute(nodeList) {
     if (absURL) {
       return el;
     } else {
-      // Set the src/href attribute to an absolute version. 
+      // Set the src/href attribute to an absolute version.
       // if (attr.indexOf('/') != 0) { // src="images/test.jpg"
       //        el.setAttribute(attrName, document.location.origin + document.location.pathname + attr);
       //      } else if (attr.match(/^\/\//)) { // src="//static.server/test.jpg"
@@ -62,10 +62,25 @@ function screenshotPage() {
   // we duplicate. This ensures no broken links when viewing the duplicate.
   urlsToAbsolute(document.images);
   urlsToAbsolute(document.querySelectorAll("link[rel='stylesheet']"));
+
+
+
   //urlsToAbsolute(document.scripts);
 
   // 2. Duplicate entire document.
   var screenshot = document.documentElement.cloneNode(true);
+
+
+  [].forEach.call(screenshot.querySelectorAll("input"), function(i) {
+    i.setAttribute("data-value", i.value);
+console.log("HERE",i);
+  });
+
+
+  var scripts = [].forEach.call(screenshot.querySelectorAll("script"), function(s) {
+    s.parentNode.removeChild(s);
+  });
+
 
   // Use <base> to make anchors and other relative links absolute.
   var b = document.createElement('base');
