@@ -23,17 +23,15 @@ Author: Eric Bidelman (ebidel@gmail.com)
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
 
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-
-<style>
-  body {
-    font-family: 'Open Sans';
-  }
-  iframe {
-    width: 100%;
-    height: 500px;
-    border: 1px solid black;
-  }
-</style>
+  <style>
+    body {
+    }
+    iframe {
+      width: 100%;
+      height: 500px;
+      border: 1px solid #eee;
+    }
+  </style>
 </head>
 <body>
 
@@ -46,10 +44,10 @@ Author: Eric Bidelman (ebidel@gmail.com)
 <script src="screencapture.js"></script>
 <script src="app.js"></script>
 <script>
+
 var framesContainer = document.querySelector('#frames-container');
-var currentFrameIdx = 0;
-var playbackIntervalId = null;
 var ws = connect();
+
 
 ws.onmessage = function(e) {
   // Shouldn't have to create a new blob, but e.data isn't preserving type.
@@ -58,13 +56,19 @@ ws.onmessage = function(e) {
 //console.log(blob);
 
   var frame = $("#screenshot0")[0];
+
+  renderFrame(frame, e.data);
+
+  // Force the iframe content to load by appending to the DOM.
+  //framesContainer.appendChild(iframe);
+};
+
+function renderFrame(frame, data) {
+
   frame.hidden = false;
-
   var docElement = frame.contentWindow.document.documentElement;
-  $(docElement).html(e.data);
-
+  $(docElement).html(data);
   var doc = $(frame).contents()[0];
-
 
   //console.log(doc, doc.body, $(frame).contents().find("body"));
   $(doc).find("input").each(function() {
@@ -83,70 +87,14 @@ ws.onmessage = function(e) {
   //var scrollY = doc.body.dataset.scrollY || 0;
   //  frame.contentWindow.scrollTo(scrollX, scrollY);
 
-  //var iframe = $("#screenshot0")[0];
-  //iframe.src = window.URL.createObjectURL(blob);
-  //iframe.onload = renderFrame;
-
-  // Force the iframe content to load by appending to the DOM.
-  //framesContainer.appendChild(iframe);
-};
-
-function renderFrame() {
-
-  var frame = $("#screenshot0")[0];
-  frame.hidden = false;
-  $(frame.contentWindow.document).find("input").each(function() {
-    $(this).val($(this).attr("data-value"));
-  });
-
-return;
-
-  if (framesContainer.children.length) {
-    var frame = framesContainer.children[currentFrameIdx];
-
-    if(!frame) {
-      return;
-    }
-
-    if (currentFrameIdx > 0) {
-
-      var prevFrame = frame.previousElementSibling;
-      prevFrame.hidden = true;
-      window.URL.revokeObjectURL(prevFrame.src);
-    }
-
-    frame.hidden = false;
-    currentFrameIdx++;
-  }
 }
 
-function playback(interval) {
-  clearInterval(playbackIntervalId);
-
-  if (!framesContainer.children.length) {
-    return;
-  }
-
-  var i = 0;
-  playbackIntervalId = setInterval(function() {
-    var iframe = framesContainer.children[i];
-    if (i > 0) {
-      framesContainer.children[i - 1].hidden = true;
-    } else if (i == 0) {
-      framesContainer.children[framesContainer.children.length - 1].hidden = true;
-    }
-    iframe.hidden = false;
-
-    i++;
-    i %= framesContainer.children.length;
-  }, interval);
-}
-
-//setInterval(renderFrame, 1000);
 </script>
+
 <!--[if IE]>
 <script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
 <script>CFInstall.check({mode: 'overlay'});</script>
 <![endif]-->
+
 </body>
 </html>
