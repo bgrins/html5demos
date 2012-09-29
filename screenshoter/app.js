@@ -2,11 +2,11 @@ window.URL = window.URL || window.webkitURL;
 
 var WS_HOST = 'localhost:3000';
 var ws = null;
-var REFRESH_EVERY = 5000; // ms
+var REFRESH_EVERY = 10000; // ms
 
 function connect() {
   ws = new WebSocket('ws://' + WS_HOST, ['dumby-protocol']);
-  ws.binaryType = 'blob';
+  //ws.binaryType = 'blob';
 
   ws.onopen = function(e) {
     console.log('WebSocket connection OPEN');

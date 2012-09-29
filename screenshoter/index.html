@@ -53,11 +53,39 @@ var ws = connect();
 
 ws.onmessage = function(e) {
   // Shouldn't have to create a new blob, but e.data isn't preserving type.
-  var blob = new Blob([e.data], {type: 'text/html'});
-console.log(blob);
-  var iframe = $("#screenshot0")[0];
-  iframe.src = window.URL.createObjectURL(blob);
-  iframe.onload = renderFrame;
+  //console.log(e.data);
+ //var blob = new Blob([e.data], {type: 'text/html'});
+//console.log(blob);
+
+  var frame = $("#screenshot0")[0];
+  frame.hidden = false;
+
+  var docElement = frame.contentWindow.document.documentElement;
+  $(docElement).html(e.data);
+
+  var doc = $(frame).contents()[0];
+
+
+  //console.log(doc, doc.body, $(frame).contents().find("body"));
+  $(doc).find("input").each(function() {
+    $(this).val($(this).attr("data-value"));
+  });
+
+  docElement.style.pointerEvents = 'none';
+  docElement.style.overflow = 'hidden';
+  docElement.style.webkitUserSelect = 'none';
+  docElement.style.mozUserSelect = 'none';
+  docElement.style.msUserSelect = 'none';
+  docElement.style.oUserSelect = 'none';
+  docElement.style.userSelect = 'none';
+
+  //var scrollX = doc.body.dataset.scrollX || 0;
+  //var scrollY = doc.body.dataset.scrollY || 0;
+  //  frame.contentWindow.scrollTo(scrollX, scrollY);
+
+  //var iframe = $("#screenshot0")[0];
+  //iframe.src = window.URL.createObjectURL(blob);
+  //iframe.onload = renderFrame;
 
   // Force the iframe content to load by appending to the DOM.
   //framesContainer.appendChild(iframe);

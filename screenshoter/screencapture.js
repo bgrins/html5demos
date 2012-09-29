@@ -58,29 +58,24 @@ function urlsToAbsolute(nodeList) {
 
 // TODO: current limitation is css background images are not included.
 function screenshotPage() {
+
   // 1. Rewrite current doc's imgs, css, and script URLs to be absolute before
   // we duplicate. This ensures no broken links when viewing the duplicate.
   urlsToAbsolute(document.images);
   urlsToAbsolute(document.querySelectorAll("link[rel='stylesheet']"));
 
-
-
-  //urlsToAbsolute(document.scripts);
-
   // 2. Duplicate entire document.
   var screenshot = document.documentElement.cloneNode(true);
 
-
-  [].forEach.call(screenshot.querySelectorAll("input"), function(i) {
+  // Serialize input values
+  [].forEach.call(screenshot.querySelectorAll("input, textarea"), function(i) {
     i.setAttribute("data-value", i.value);
-console.log("HERE",i);
   });
 
-
+  // Remove all scripts
   var scripts = [].forEach.call(screenshot.querySelectorAll("script"), function(s) {
     s.parentNode.removeChild(s);
   });
-
 
   // Use <base> to make anchors and other relative links absolute.
   var b = document.createElement('base');
@@ -97,22 +92,28 @@ console.log("HERE",i);
   screenshot.style.oUserSelect = 'none';
   screenshot.style.userSelect = 'none';
 
+  var body = screenshot.querySelector('body');
   // 4. Preserve current x,y scroll position of this page. See addOnPageLoad_().
-  screenshot.dataset.scrollX = window.scrollX;
-  screenshot.dataset.scrollY = window.scrollY;
+  body.dataset.scrollX = window.scrollX;
+  body.dataset.scrollY = window.scrollY;
 
   // 4.5. When the screenshot loads (e.g. as ablob URL, as iframe.src, etc.),
   // scroll it to the same location of this page. Do this by appending a
   // window.onDOMContentLoaded listener which pulls out the saved scrollX/Y
   // state from the DOM.
-  var script = document.createElement('script');
-  script.textContent = '(' + addOnPageLoad_.toString() + ')();'; // self calling.
-  screenshot.querySelector('body').appendChild(script);
+  //var script = document.createElement('script');
+  //script.textContent = '(' + addOnPageLoad_.toString() + ')();'; // self calling.
+  //body.appendChild(script);
+
+  //return JSON.stringify({
+  //  header: screenshot.querySelector("head").innerHTML,
+  //  body: body.innerHTML,
+  //});
 
   // 5. Create a new .html file from the cloned content.
-  var blob = new Blob([screenshot.outerHTML], {type: 'text/html'});
-
-  return blob;
+  return screenshot.outerHTML;
+  //var blob = new Blob([screenshot.outerHTML], {type: 'text/html'});
+  //return blob;
 }
 
 // NOTE: Not to be invoked directly. When the screenshot loads, it should scroll
